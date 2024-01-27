@@ -50,7 +50,12 @@ func (db *userRepository) UpdateUser(user models.User) (models.User, error) {
 }
 
 func (db *userRepository) DeleteUser(user models.User) (models.User, error) {
+	if err := db.connection.Model(&models.Photo{}).Where("user_id = ?", user.ID).Delete(&models.Photo{}).Error; err != nil {
+		db.connection.Rollback()
+		return user, err
+	}
 	if err := db.connection.First(&user, user.ID).Error; err != nil {
+		db.connection.Rollback()
 		return user, err
 	}
 	return user, db.connection.Delete(&user).Error

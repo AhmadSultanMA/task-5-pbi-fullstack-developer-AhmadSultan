@@ -26,7 +26,7 @@ func NewPhotoRepository() PhotoRepository {
 }
 
 func (db *photoRepository) GetPhoto(userID uint, id int) (Photo models.Photo, err error) {
-	return Photo, db.connection.Preload(clause.Associations).Where("user_id = ?", userID).First(&Photo).Error
+	return Photo, db.connection.Preload(clause.Associations).Where("user_id = ?", userID).Where("id = ?", id).First(&Photo).Error
 }
 
 func (db *photoRepository) AddPhoto(userID uint, Photo models.Photo) (models.Photo, error) {

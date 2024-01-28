@@ -19,7 +19,7 @@ type UserHandler interface {
 	SignInUser(*gin.Context)
 	UpdateUser(*gin.Context)
 	DeleteUser(*gin.Context)
-	GetPhoto(*gin.Context)
+	GetAllPhoto(*gin.Context)
 }
 
 type userHandler struct {
@@ -159,7 +159,7 @@ func (h *userHandler) DeleteUser(ctx *gin.Context) {
 
 }
 
-func (h *userHandler) GetPhoto(ctx *gin.Context) {
+func (h *userHandler) GetAllPhoto(ctx *gin.Context) {
 	userID := uint(ctx.MustGet("userID").(float64))
 	if photos, err := h.repo.GetAllPhoto(userID); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{

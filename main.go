@@ -39,7 +39,7 @@ func main() {
 	userProtectedRoutes := apiRoutes.Group("/users", middleware.AuthorizeJWT())
 	{
 		userProtectedRoutes.GET("/", userHandler.GetUser)
-		userProtectedRoutes.GET("/photo", userHandler.GetPhoto)
+		userProtectedRoutes.GET("/photo", userHandler.GetAllPhoto)
 		userProtectedRoutes.PUT("/:user", userHandler.UpdateUser)
 		userProtectedRoutes.DELETE("/:user", userHandler.DeleteUser)
 	}

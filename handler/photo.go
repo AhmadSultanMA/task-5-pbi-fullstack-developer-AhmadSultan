@@ -67,8 +67,8 @@ func (h *photoHandler) AddPhoto(ctx *gin.Context) {
 }
 func (h *photoHandler) UpdatePhoto(ctx *gin.Context) {
 
-	var Photo models.Photo
-	if err := ctx.ShouldBindJSON(&Photo); err != nil {
+	var updateData map[string]interface{}
+	if err := ctx.ShouldBindJSON(&updateData); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -79,7 +79,6 @@ func (h *photoHandler) UpdatePhoto(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	Photo.ID = uint(intID)
 	userID := uint(ctx.MustGet("userID").(float64))
 	repo := repository.NewPhotoRepository()
 	photo, err := repo.GetPhoto(userID, intID)
@@ -93,7 +92,7 @@ func (h *photoHandler) UpdatePhoto(ctx *gin.Context) {
 		return
 	}
 
-	Photo, err = h.repo.UpdatePhoto(Photo)
+	photo, err = h.repo.UpdatePhoto(uint(intID), updateData)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

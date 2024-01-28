@@ -2,8 +2,6 @@ package models
 
 //models
 import (
-	"errors"
-
 	"gorm.io/gorm"
 )
 
@@ -14,17 +12,6 @@ type User struct {
 	Password string  `json:"password" `
 	NoTelp   string  `json:"notelp"`
 	Photos   []Photo `gorm:"foreignkey:UserID;constraint:OnDelete:CASCADE;"`
-}
-
-func (u *User) BeforeSave(tx *gorm.DB) (err error) {
-	if !isValidPassword(u.Password) {
-		err = errors.New("password must be at least 6 words")
-	}
-	return
-}
-
-func isValidPassword(password string) bool {
-	return len(password) >= 6
 }
 
 func (User) TableName() string {

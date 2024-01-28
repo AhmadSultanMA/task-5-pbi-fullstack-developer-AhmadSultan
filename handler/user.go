@@ -98,17 +98,19 @@ func (h *userHandler) AddUser(ctx *gin.Context) {
 }
 
 func (h *userHandler) UpdateUser(ctx *gin.Context) {
-	var user models.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var updateData map[string]interface{}
+	if err := ctx.ShouldBindJSON(&updateData); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	id := ctx.Param("user")
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	user.ID = uint(intID)
+
 	userID := uint(ctx.MustGet("userID").(float64))
 	repo := repository.NewUserRepository()
 	users, err := repo.GetUser(uint(intID))
@@ -121,12 +123,13 @@ func (h *userHandler) UpdateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "you dont have permission"})
 		return
 	}
-	user, err = h.repo.UpdateUser(user)
+
+	user, err := h.repo.UpdateUser(uint(intID), updateData)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
-
 	}
+
 	ctx.JSON(http.StatusOK, user)
 }
 

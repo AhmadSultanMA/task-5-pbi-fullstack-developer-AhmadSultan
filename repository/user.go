@@ -13,7 +13,7 @@ type UserRepository interface {
 	AddUser(models.User) (models.User, error)
 	GetUser(uint) (models.User, error)
 	GetByEmail(string) (models.User, error)
-	UpdateUser(models.User) (models.User, error)
+	UpdateUser(uint, map[string]interface{}) (models.User, error)
 	DeleteUser(models.User) (models.User, error)
 	GetAllPhoto(uint) ([]models.Photo, error)
 }
@@ -41,11 +41,17 @@ func (db *userRepository) AddUser(user models.User) (models.User, error) {
 	return user, db.connection.Create(&user).Error
 }
 
-func (db *userRepository) UpdateUser(user models.User) (models.User, error) {
-	err := db.connection.Model(&models.User{}).Where("id=?", user.ID).Updates(&user)
-	if err.Error != nil {
-		return models.User{}, err.Error
+func (db *userRepository) UpdateUser(id uint, updateData map[string]interface{}) (models.User, error) {
+	user := models.User{}
+	err := db.connection.Model(&models.User{}).Where("id=?", id).Updates(updateData).Error
+	if err != nil {
+		return models.User{}, err
 	}
+	err = db.connection.First(&user, id).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
 	return user, nil
 }
 

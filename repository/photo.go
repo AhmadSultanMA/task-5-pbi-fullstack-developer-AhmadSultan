@@ -11,7 +11,7 @@ import (
 type PhotoRepository interface {
 	GetPhoto(uint, int) (models.Photo, error)
 	AddPhoto(uint, models.Photo) (models.Photo, error)
-	UpdatePhoto(models.Photo) (models.Photo, error)
+	UpdatePhoto(uint, map[string]interface{}) (models.Photo, error)
 	DeletePhoto(models.Photo) (models.Photo, error)
 }
 
@@ -33,12 +33,19 @@ func (db *photoRepository) AddPhoto(userID uint, Photo models.Photo) (models.Pho
 	return Photo, db.connection.Preload(clause.Associations).Where("user_id = ?", userID).Create(&Photo).Error
 }
 
-func (db *photoRepository) UpdatePhoto(Photo models.Photo) (models.Photo, error) {
-	err := db.connection.Where("id=?", Photo.ID).Updates(&Photo)
-	if err.Error != nil {
-		return models.Photo{}, err.Error
+func (db *photoRepository) UpdatePhoto(id uint, updateData map[string]interface{}) (models.Photo, error) {
+	photo := models.Photo{}
+
+	err := db.connection.Model(&models.Photo{}).Where("id=?", id).Updates(updateData).Error
+	if err != nil {
+		return models.Photo{}, err
 	}
-	return Photo, nil
+	err = db.connection.First(&photo, id).Error
+	if err != nil {
+		return models.Photo{}, err
+	}
+
+	return photo, nil
 }
 
 func (db *photoRepository) DeletePhoto(Photo models.Photo) (models.Photo, error) {
